@@ -1,7 +1,7 @@
 {
   "name": "skill-assesment",
   "version": "1.0.0",
-  "description": "",
+  "description": "Este proyecto utiliza javascript, express y jest/supertest para que sea sencillo.\r Eres libre de agregar cualquier dependencia que puedas necesitar.",
   "main": "index.js",
   "scripts": {
     "test": "jest",
@@ -12,10 +12,20 @@
   "dependencies": {
     "@hapi/joi": "^17.1.1",
     "express": "^4.17.1",
+    "fetch": "^1.1.0",
+    "node-fetch": "^3.2.3",
     "nodemon": "^2.0.15"
   },
   "devDependencies": {
     "jest": "^26.0.1",
     "supertest": "^4.0.2"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mariano-farace/ITA-test.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mariano-farace/ITA-test/issues"
+  },
+  "homepage": "https://github.com/mariano-farace/ITA-test#readme"
 }
