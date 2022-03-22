@@ -1,21 +1,27 @@
 const fetch = (...args) =>
   import("node-fetch").then(({ default: fetch }) => fetch(...args));
 
-const { filterItAcademyUsers } = require("../helpers");
+const { filterItAcademyUsers, deleteSync, upsert } = require("../helpers");
 
 const syncUsers = (userRepository) => {
   return async (req, res) => {
     const response = await fetch(
       "https://api.github.com/search/users?q=it-academy"
     );
+
     const data = await response.json();
-    const externalUsers = data.items;
-    console.log("type of", typeof externalUsers);
+    const totalExternalDBUsers = data.items;
+    //External DB users
+    const externalDBUsers = filterItAcademyUsers(totalExternalDBUsers);
+    console.log("externalDBUsers lenght", externalDBUsers.length);
+    //Internal DB users
+    const localDBUsers = userRepository.findAllUsers();
 
-    const allUsersFoundInDB = userRepository.findAllUsers();
-    console.log(externalUsers);
+    //Delete users that exist on localDB but not externalDB
+    deleteSync(localDBUsers, externalDBUsers, userRepository);
+    upsert(externalDBUsers, userRepository);
 
-    res.sendStatus(501);
+    res.send("Synchronization succeeded");
   };
 };
 
