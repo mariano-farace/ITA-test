@@ -9,19 +9,12 @@ const filterItAcademyUsers = (userArray) => {
   );
 };
 
-//!Validar todo con joi?????
-
-//Primero deberias extrar el campo "login" de la EDB que mapea a la key userID
-
-//Para cada ebd.login, hacer una busqueda por nombre en la LDB. Si no existe, crealo, si existe, verifici
-
-//añade los usuario que no existen en la bd local. Los comprueba con el nombre de usuario.
-//Si el userid existe en EDB (como login) pero no EN LDB(como userid), LO CREA. username es obligatorio, y va a ser el login de la base comun
-//Va a ser un filter usando la funcion findByUserName de LDB
-const upsert = (externalDBUsers, userRepository) => {
+const upsertAndDelete = (localDBUsers, externalDBUsers, userRepository) => {
   let createdCount = 0;
   let updatedCount = 0;
+  let deletedCount = 0;
 
+  //Upsert
   externalDBUsers.forEach((eUser) => {
     let wasFound = userRepository.findByUserName(eUser.login);
     if (wasFound == undefined) {
@@ -40,14 +33,7 @@ const upsert = (externalDBUsers, userRepository) => {
       updatedCount++;
     }
   });
-
-  return { created: createdCount, updated: updatedCount };
-};
-
-//para borrar los usuario de la base de datos es exactamente al revez
-
-const deleteSync = (localDBUsers, externalDBUsers, userRepository) => {
-  let deletedCount = 0;
+  //Delete
   let toBeDeleted = localDBUsers.filter(
     (localUser) =>
       !externalDBUsers.map((eUser) => eUser.login).includes(localUser.userName)
@@ -56,9 +42,11 @@ const deleteSync = (localDBUsers, externalDBUsers, userRepository) => {
     userRepository.deleteUserByUserName(user.userName);
     deletedCount++;
   });
-  return { deleted: deletedCount };
+  return {
+    created: createdCount,
+    updated: updatedCount,
+    deleted: deletedCount,
+  };
 };
 
-//el update te lo debo:: compara los objetos por unique key (username/login), si isEqual devuelve false, hace update
-
-module.exports = { filterItAcademyUsers, deleteSync, upsert };
+module.exports = { filterItAcademyUsers, upsertAndDelete };

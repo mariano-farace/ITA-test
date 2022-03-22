@@ -1,7 +1,7 @@
 const fetch = (...args) =>
   import("node-fetch").then(({ default: fetch }) => fetch(...args));
 
-const { filterItAcademyUsers, deleteSync, upsert } = require("../helpers");
+const { filterItAcademyUsers, upsertAndDelete } = require("../helpers");
 
 const syncUsers = (userRepository) => {
   return async (req, res) => {
@@ -16,18 +16,15 @@ const syncUsers = (userRepository) => {
     //Internal DB users
     const localDBUsers = userRepository.findAllUsers();
 
-    //Delete users that exist on localDB but not externalDB
-    const deleteResult = deleteSync(
+    const result = upsertAndDelete(
       localDBUsers,
       externalDBUsers,
       userRepository
     );
-    const upsertResult = upsert(externalDBUsers, userRepository);
 
     res.json({
       message: "Synchronization succeeded",
-      upsertResult,
-      deleteResult,
+      result,
     });
   };
 };
